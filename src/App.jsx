@@ -3,6 +3,44 @@ import { useState } from "react"
 function App() {
 
   const [formData, setFormData] = useState({})
+  const [errors, setErrors] = useState({})
+
+  const letters = "abcdefghijklmnopqrstuvwxyz";
+  const numbers = "0123456789";
+  const symbols = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
+
+  function validateUsername(username) {
+    if (!username) return "Username obbligatorio"
+    if (username.length < 6) return "Minimo 6 caratteri"
+    for (let c of username) {
+      if (!letters.includes(c) && !numbers.includes(c)) {
+        return "Solo caratteri alfanumerici"
+      }
+    }
+    return ""
+  }
+  function validatePassword(password) {
+    if (!password) return "Password obbligatoria"
+    if (password.length < 8) return "Minimo 8 caratteri"
+    let hasLetters = false
+    let hasNumbers = false
+    let hasSymbols = false
+    for (let c of password) {
+      if (letters.includes(c)) hasLetters = true
+      else if (numbers.includes(c)) hasNumbers = true
+      else if (symbols.includes(c)) hasSymbols = true
+    }
+    if (!hasLetters) return "Deve contenere almeno una lettera"
+    if (!hasNumbers) return "Deve contenere almeno un numero"
+    if (!hasSymbols) return "Deve contenere almeno un simbolo"
+    return ""
+  }
+  function validateDescrizione(descrizione) {
+    if (!descrizione) return "Descrizione obbligatoria"
+    if (descrizione.trim().length < 100) return "Minimo 100 caratteri"
+    if (descrizione.trim().length > 1000) return "Massimo 1000 caratteri"
+    return ""
+  }
 
   function handleChange(e) {
     const { name, value } = e.target
@@ -10,7 +48,17 @@ function App() {
       ...curr,
       [name]: value
     }))
+
+    let err = "";
+    if (name === "username") err = validateUsername(value)
+    if (name === "password") err = validatePassword(value)
+    if (name === "descrizione") err = validateDescrizione(value)
+    setErrors(curr => ({
+      ...curr,
+      [name]: err
+    }))
   }
+
 
   function handleSubmit(e) {
     e.preventDefault()
@@ -22,11 +70,23 @@ function App() {
       "anniDiEsperienza",
       "descrizione"
     ]
+    //validazione finale creo oggetto che viene popolato al controllo delle proprietò
+    const newErrors = {
+      username: validateUsername(formData.username),
+      password: validatePassword(formData.password),
+      descrizione: validateDescrizione(formData.descrizione)
+    }
+    setErrors(curr => ({ ...curr, ...newErrors }))
+
+
     const datiRaccolti = datiNecessari.every(d => formData[d] && formData[d].toString().trim() !== "")
-    if (!datiRaccolti) {
-      console.error("Compila tutti i campi")
+    const erroriDiValidazione = Object.values(newErrors).every(e => !e)
+
+    if (!datiRaccolti || !erroriDiValidazione) {
+      console.error("Compila tutti i campi correttamente")
     } else {
       console.log(formData)
+      console.log(errors)
     }
   }
 
@@ -60,20 +120,28 @@ function App() {
                 value={formData.username || ""}
                 onChange={handleChange}
               />
+              {
+                errors.username && (
+                  <div className="text-danger">{errors.username}</div>
+                )
+              }
             </div>
             <div className="col-md-4">
               <label className="form-label">Password</label>
-              <div className="input-group">
-                <input
-                  type="password"
-                  className="form-control"
-                  id="validationCustomUsername"
-                  aria-describedby="inputGroupPrepend"
-                  name="password"
-                  value={formData.password || ""}
-                  onChange={handleChange}
-                />
-              </div>
+              <input
+                type="password"
+                className="form-control"
+                id="validationCustomUsername"
+                aria-describedby="inputGroupPrepend"
+                name="password"
+                value={formData.password || ""}
+                onChange={handleChange}
+              />
+              {
+                errors.password && (
+                  <div className="text-danger">{errors.password}</div>
+                )
+              }
             </div>
             <div className="col-6">
               <label className="form-label">Specializzazione</label>
@@ -83,7 +151,6 @@ function App() {
                 name="specializzazione"
                 value={formData.specializzazione || ""}
                 onChange={handleChange}
-
               >
                 <option value="" disabled>
                   Seleziona una specializzazione...
@@ -99,7 +166,6 @@ function App() {
                 type="number"
                 className="form-control"
                 id="validationCustom03"
-
                 min={0}
                 name="anniDiEsperienza"
                 value={formData.anniDiEsperienza || ""}
@@ -107,14 +173,19 @@ function App() {
             </div>
             <div className="col-12">
               <label className="form-label">Breve descrizione</label>
-              <input
-                type="text-area"
+              <textarea
                 className="form-control"
                 id="validationCustom05"
                 name="descrizione"
                 value={formData.descrizione || ""}
                 onChange={handleChange}
+                rows={4}
               />
+              {
+                errors.descrizione && (
+                  <div className="text-danger">{errors.descrizione}</div>
+                )
+              }
             </div>
             <div className="col-12">
               <button
