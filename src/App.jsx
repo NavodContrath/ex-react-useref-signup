@@ -1,9 +1,13 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 
 function App() {
 
   const [formData, setFormData] = useState({})
   const [errors, setErrors] = useState({})
+
+  const nomeCompletoRef = useRef()
+  const specializzazioneRef = useRef()
+  const anniDiEsperienzaRef = useRef()
 
   const letters = "abcdefghijklmnopqrstuvwxyz";
   const numbers = "0123456789";
@@ -19,6 +23,7 @@ function App() {
     }
     return ""
   }
+
   function validatePassword(password) {
     if (!password) return "Password obbligatoria"
     if (password.length < 8) return "Minimo 8 caratteri"
@@ -35,6 +40,7 @@ function App() {
     if (!hasSymbols) return "Deve contenere almeno un simbolo"
     return ""
   }
+
   function validateDescrizione(descrizione) {
     if (!descrizione) return "Descrizione obbligatoria"
     if (descrizione.trim().length < 100) return "Minimo 100 caratteri"
@@ -59,18 +65,12 @@ function App() {
     }))
   }
 
-
   function handleSubmit(e) {
     e.preventDefault()
-    const datiNecessari = [
-      "nomeCompleto",
-      "username",
-      "password",
-      "specializzazione",
-      "anniDiEsperienza",
-      "descrizione"
-    ]
-    //validazione finale creo oggetto che viene popolato al controllo delle proprietò
+
+    const nomeCompleto = nomeCompletoRef.current.value
+    const specializzazione = specializzazioneRef.current.value
+    const anniDiEsperienza = anniDiEsperienzaRef.current.value
     const newErrors = {
       username: validateUsername(formData.username),
       password: validatePassword(formData.password),
@@ -79,7 +79,14 @@ function App() {
     setErrors(curr => ({ ...curr, ...newErrors }))
 
 
-    const datiRaccolti = datiNecessari.every(d => formData[d] && formData[d].toString().trim() !== "")
+    const datiRaccolti =
+      nomeCompleto.trim() !== "" &&
+      specializzazione.trim() !== "" &&
+      anniDiEsperienza.trim() !== "" &&
+      formData.username &&
+      formData.password &&
+      formData.descrizione
+
     const erroriDiValidazione = Object.values(newErrors).every(e => !e)
 
     if (!datiRaccolti || !erroriDiValidazione) {
@@ -88,6 +95,7 @@ function App() {
       console.log(formData)
       console.log(errors)
     }
+
   }
 
 
@@ -105,9 +113,8 @@ function App() {
                 type="text"
                 className="form-control"
                 id="validationCustom01"
-                name="nomeCompleto"
-                value={formData.nomeCompleto || ""}
-                onChange={handleChange}
+                ref={nomeCompletoRef}
+
               />
             </div>
             <div className="col-md-4">
@@ -148,11 +155,9 @@ function App() {
               <select
                 className="form-select"
                 id="validationCustom04"
-                name="specializzazione"
-                value={formData.specializzazione || ""}
-                onChange={handleChange}
+                ref={specializzazioneRef}
               >
-                <option value="" disabled>
+                <option value="">
                   Seleziona una specializzazione...
                 </option>
                 <option>Full-stack</option>
@@ -167,9 +172,7 @@ function App() {
                 className="form-control"
                 id="validationCustom03"
                 min={0}
-                name="anniDiEsperienza"
-                value={formData.anniDiEsperienza || ""}
-                onChange={handleChange} />
+                ref={anniDiEsperienzaRef} />
             </div>
             <div className="col-12">
               <label className="form-label">Breve descrizione</label>
