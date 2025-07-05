@@ -71,6 +71,8 @@ function App() {
     const nomeCompleto = nomeCompletoRef.current.value
     const specializzazione = specializzazioneRef.current.value
     const anniDiEsperienza = anniDiEsperienzaRef.current.value
+
+
     const newErrors = {
       username: validateUsername(formData.username),
       password: validatePassword(formData.password),
@@ -92,13 +94,19 @@ function App() {
     if (!datiRaccolti || !erroriDiValidazione) {
       console.error("Compila tutti i campi correttamente")
     } else {
-      console.log(formData)
+      const datiFinali = {
+        nomeCompleto,
+        specializzazione,
+        anniDiEsperienza,
+        username: formData.username,
+        password: formData.password,
+        descrizione: formData.descrizione
+      };
+      console.log(datiFinali)
       console.log(errors)
     }
 
   }
-
-
 
   return (
     <>
