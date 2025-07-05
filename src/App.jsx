@@ -1,5 +1,9 @@
 import { useState, useRef } from "react"
 
+const letters = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
+const symbols = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
+
 function App() {
 
   const [formData, setFormData] = useState({})
@@ -8,10 +12,6 @@ function App() {
   const nomeCompletoRef = useRef()
   const specializzazioneRef = useRef()
   const anniDiEsperienzaRef = useRef()
-
-  const letters = "abcdefghijklmnopqrstuvwxyz";
-  const numbers = "0123456789";
-  const symbols = "!@#$%^&*()-_=+[]{}|;:',.<>?/`~";
 
   function validateUsername(username) {
     if (!username) return "Username obbligatorio"
@@ -128,9 +128,9 @@ function App() {
                 onChange={handleChange}
               />
               {
-                errors.username && (
+                errors.username ?
                   <div className="text-danger">{errors.username}</div>
-                )
+                  : (formData.username && <div className="text-success">Username Valido</div>)
               }
             </div>
             <div className="col-md-4">
@@ -145,9 +145,9 @@ function App() {
                 onChange={handleChange}
               />
               {
-                errors.password && (
+                errors.password ?
                   <div className="text-danger">{errors.password}</div>
-                )
+                  : (formData.password && <div className="text-success">Password Valida</div>)
               }
             </div>
             <div className="col-6">
@@ -185,9 +185,9 @@ function App() {
                 rows={4}
               />
               {
-                errors.descrizione && (
+                errors.descrizione ?
                   <div className="text-danger">{errors.descrizione}</div>
-                )
+                  : (formData.descrizione && <div className="text-success">Descrizione Valida</div>)
               }
             </div>
             <div className="col-12">
